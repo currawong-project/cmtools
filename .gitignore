@@ -1,0 +1,36 @@
+# directories to ignore
+libcm
+
+.deps
+autom4te.cache
+build-aux
+build/linux/debug/src/
+build/linux/debug/bin
+build/linux/debug/lib
+build/linux/debug/include
+build/linux/release/src/
+build/linux/release/bin
+build/linux/release/lib
+build/linux/release/include
+
+#Files to ignore
+*~
+*.[oa]
+
+Makefile
+aclocal.m4
+config.h.in
+config.h
+configure
+hold.makefile
+Makefile.in
+config.log
+config.status
+libtool
+stamp-h1
+
+m4/libtool.m4
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/ltversion.m4
+m4/lt~obsolete.m4
