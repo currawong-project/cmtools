@@ -89,10 +89,17 @@ of measured notes.  Note that a decremented color stops all active measures
 not just the measurement associated with the decremented color.  
 
 
+### Section Numbering
+
+Rectangles around a number indicate sections numbers.
+Sections are used to aggregate measurements and to 
+indicate where particular transforms will be applied in the electronic score.
+
+
 Preparing the Music XML File
 ----------------------------
 
-*xscore_gen* is know to work with the MusicXML files produced by
+*xscore_gen* is known to work with the MusicXML files produced by
 the [Dolet 6 Sibelius plug-in]<https://www.musicxml.com/>
 
 After generating the file it is necessary to do some
@@ -100,12 +107,30 @@ minor pre-processing before submitting it to *xscore_gen*
 
 iconv -f UTF-16 -t UTF-8 -o score-utf16.xml score-utf8.xml
 
+On the first line of score-utf8.xml change:
+
+```
+<?xml version='1.0' encoding='UTF-16' standalone='no'?>
+```
+
+to 
+
+```
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+```
+
+Note that naively opening `score-utf8.xml` with emacs will
+crash emacs because the stated XML file encoding `encoding='UTF-16'`
+will not match the actual file encoding (UTF-8).  Work around
+this problem by editing the first line with `vi`.
+
+
 
 Create the decoration file
 --------------------------
 
 ```
-cmtools --score_gen -x myscore.xml -d mydec.txt
+cmtools --score_gen -x myscore.xml -d mydec.txt {--damper}
 ```
 
 Here's a snippet of a typical 'decoration' file.

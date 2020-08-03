@@ -103,13 +103,13 @@ bool verify_non_null_filename( cmCtx_t* ctx, const cmChar_t* fn, const cmChar_t*
   return kOkCtRC;
 }
 
-cmRC_t score_gen( cmCtx_t* ctx, const cmChar_t* xmlFn, const cmChar_t* decFn, const cmChar_t* csvOutFn, const cmChar_t* midiOutFn, const cmChar_t* svgOutFn, unsigned reportFl, int begMeasNumb, int begTempoBPM, bool svgStandAloneFl, bool svgPanZoomFl )
+cmRC_t score_gen( cmCtx_t* ctx, const cmChar_t* xmlFn, const cmChar_t* decFn, const cmChar_t* csvOutFn, const cmChar_t* midiOutFn, const cmChar_t* svgOutFn, unsigned reportFl, int begMeasNumb, int begTempoBPM, bool svgStandAloneFl, bool svgPanZoomFl, bool damperRptFl )
 {
   cmRC_t rc;
   if((rc = verify_file_exists(ctx,xmlFn,"XML file")) != kOkCtRC )
     return rc;
   
-  if( cmXScoreTest( ctx, xmlFn, decFn, csvOutFn, midiOutFn, svgOutFn, reportFl, begMeasNumb, begTempoBPM, svgStandAloneFl, svgPanZoomFl ) != kOkXsRC )
+  if( cmXScoreTest( ctx, xmlFn, decFn, csvOutFn, midiOutFn, svgOutFn, reportFl, begMeasNumb, begTempoBPM, svgStandAloneFl, svgPanZoomFl, damperRptFl ) != kOkXsRC )
     return cmErrMsg(&ctx->err,kScoreGenFailedCtRC,"score_gen failed.");
     
   return kOkCtRC;
@@ -206,16 +206,6 @@ cmRC_t audio_file_report( cmCtx_t* ctx, const cmChar_t* audioFn, const cmChar_t*
   return rc;
 }
 
-cmRC_t  midi_trim(cmCtx_t* ctx, const cmChar_t* midiInFn, unsigned begMidiUId, unsigned endMidiUId, const cmChar_t* midiOutFn)
-{
-  cmRC_t rc;
-  
-  if((rc = verify_file_exists(ctx,midiInFn,"MIDI file")) != kOkCtRC )
-    return rc;
-  // kNoteTerminateFl | kPedalTerminateFl
-  return cmMidiFileTrimFn(ctx,  midiInFn, begMidiUId, endMidiUId, 0, midiOutFn );
-}
-
 
 int main( int argc, char* argv[] )
 {
@@ -240,6 +230,7 @@ int main( int argc, char* argv[] )
    kSvgPanZoomFlPoId,
    kBegMeasPoId,
    kBegBpmPoId,
+   kDamperRptPoId,
    kBegMidiUidPoId,
    kEndMidiUidPoId
   };
@@ -252,8 +243,7 @@ int main( int argc, char* argv[] )
         kScoreReportSelId,
         kMidiReportSelId,
         kTimelineReportSelId,
-        kAudioReportSelId,
-        kMidiTrimSelId
+        kAudioReportSelId
   };
     
   
@@ -281,6 +271,7 @@ int main( int argc, char* argv[] )
   unsigned        svgPanZoomFl    = 1;
   int             begMeasNumb     = 0;
   int             begTempoBPM     = 60;
+  unsigned        damperRptFl     = 0;
   unsigned        begMidiUId      = cmInvalidId;
   unsigned        endMidiUId      = cmInvalidId;
   unsigned        actionSelId     = kNoSelId;
@@ -316,8 +307,6 @@ int main( int argc, char* argv[] )
   cmPgmOptInstallEnum( poH, kActionPoId, 'A', "audio_report",    0, kAudioReportSelId, kNoSelId,  &actionSelId, 1,
     "Generate an audio file report.",NULL);
 
-  cmPgmOptInstallEnum( poH, kActionPoId, 'T', "midi_trim",       0, kMidiTrimSelId, kNoSelId,  &actionSelId, 1,
-    "Trim a MIDI file to create a shortened version.",NULL);
   
   cmPgmOptInstallStr( poH, kXmlFileNamePoId,      'x', "muisic_xml_fn",0,    NULL,         &xmlFn,        1, 
     "Name of the input MusicXML file.");
@@ -361,6 +350,9 @@ int main( int argc, char* argv[] )
   cmPgmOptInstallInt( poH, kBegBpmPoId,           'e', "beg_bpm",      0,       0,          &begTempoBPM,  1,
     "Set to 0 to use the tempo from the score otherwise set to use the tempo at begMeasNumb." );
 
+  cmPgmOptInstallFlag( poH, kDamperRptPoId,        'p', "damper",       0,      1,          &damperRptFl,  1,
+    "Print the pedal events during 'score_gen' processing.");
+
   cmPgmOptInstallFlag( poH, kSvgStandAloneFlPoId,  'n', "svg_stand_alone_fl",0, 1,          &svgStandAloneFl, 1,
     "Write the SVG file as a stand alone HTML file. Enabled by default." );
 
@@ -384,7 +376,7 @@ int main( int argc, char* argv[] )
     switch( actionSelId )
     {
       case kScoreGenSelId:
-        rc = score_gen( &ctx, xmlFn, decFn, csvScoreFn, midiOutFn, svgOutFn, reportFl, begMeasNumb, begTempoBPM, svgStandAloneFl, svgPanZoomFl );
+        rc = score_gen( &ctx, xmlFn, decFn, csvScoreFn, midiOutFn, svgOutFn, reportFl, begMeasNumb, begTempoBPM, svgStandAloneFl, svgPanZoomFl, damperRptFl );
         break;
 
       case kScoreFollowSelId:
@@ -411,9 +403,6 @@ int main( int argc, char* argv[] )
         rc = audio_file_report(&ctx, audioFn, rptFn );
         break;
 
-      case kMidiTrimSelId:
-        rc = midi_trim(&ctx, midiInFn, begMidiUId, endMidiUId, midiOutFn);
-        break;
         
       default:
         rc = cmErrMsg(&ctx.err, kNoActionIdSelectedCtRC,"No action selector was selected.");
