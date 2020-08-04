@@ -277,3 +277,21 @@ in the voice assigned to the first note in the fork will be
 included in the dynamic change. To exclude a note from the
 fork assign it a lower case mark.
 
+Common Error Messages:
+----------------------
+
+The tied C#3 in measure 13 (tick:198460) was not terminated.
+
+The tied Bb3 in measure 12 marked as a tied note but is also marked to sound.
+
+
+Damper down not preceded by damper up in measure:10.
+
+Damper up not preceded by damper down in measure:23.
+
+Damper up/down not preceded by damper down in measure:%34.
+
+
+A shorten/shift operation was done to reconcile two overlapped D4 (ticks:1651523 1651983) notes in measure 335.
+
+A time embedded note (bar=350 A5) was removed even though it overlapped with a note in the same voice.

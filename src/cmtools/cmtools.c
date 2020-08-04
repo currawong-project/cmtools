@@ -350,7 +350,7 @@ int main( int argc, char* argv[] )
   cmPgmOptInstallInt( poH, kBegBpmPoId,           'e', "beg_bpm",      0,       0,          &begTempoBPM,  1,
     "Set to 0 to use the tempo from the score otherwise set to use the tempo at begMeasNumb." );
 
-  cmPgmOptInstallFlag( poH, kDamperRptPoId,        'p', "damper",       0,      1,          &damperRptFl,  1,
+  cmPgmOptInstallFlag( poH, kDamperRptPoId,        'u', "damper",       0,      1,          &damperRptFl,  1,
     "Print the pedal events during 'score_gen' processing.");
 
   cmPgmOptInstallFlag( poH, kSvgStandAloneFlPoId,  'n', "svg_stand_alone_fl",0, 1,          &svgStandAloneFl, 1,
