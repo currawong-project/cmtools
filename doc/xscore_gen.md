@@ -95,6 +95,8 @@ Rectangles around a number indicate sections numbers.
 Sections are used to aggregate measurements and to 
 indicate where particular transforms will be applied in the electronic score.
 
+TODO: Show screen shot
+
 
 Preparing the Music XML File
 ----------------------------
@@ -105,7 +107,9 @@ the [Dolet 6 Sibelius plug-in]<https://www.musicxml.com/>
 After generating the file it is necessary to do some
 minor pre-processing before submitting it to *xscore_gen*
 
+```
 iconv -f UTF-16 -t UTF-8 -o score-utf16.xml score-utf8.xml
+```
 
 On the first line of score-utf8.xml change:
 
@@ -199,6 +203,7 @@ Onset     |  *   | note onset
 Decoration Sytax:
 ------------------
 
+```
 !<dyn_mark>             Assign dynamics
 !(<dyn_mark>)             - less uncertain dynamic mark
 !<upper-case-dyn-mark>    - begin of dynamic fork (See note below regarding dynamic forks)
@@ -216,6 +221,7 @@ $<sci_pitch>            Assign a note a new pitch
   g (grace note) 
   A (after first)
   N (soon after first)
+```
 
 Note: The first non-grace note in a grace note sequence is marked with a %b.
 The last non-grace note in a grace note sequence is marked with a %s or %a.
@@ -233,16 +239,22 @@ not require an explict tick mark notation (i.e. @####)
 
 Insert/delete  Event Marks: <mark>
 -----------------------------------
- d (sostenuto down - just after note onset)
- u (    "      up  - just before this event)
- x (    "      up    just before this event and down just after it)
- D (damper pedal down - after this event)
- U (damper pedal up - before this event)
- _ (set tie end flag)
- & (skip this event)
+
+Mark | Note
+-----|--------------------------------------------------------------------------
+ d   | sostenuto down just after note onset
+ u   | sostenuto up just before this event
+ x   | sostenuto up just before this event and down just after it
+ D   | damper pedal down after this event
+ U   | damper pedal up before this event
+ _   | set tie end flag
+ &   | skip this event
+
 
 Dynamic Marks: <dyn-mark>
 --------------------------
+
+```
   s       (silent note)
   pppp-
   pppp
@@ -268,9 +280,11 @@ Dynamic Marks: <dyn-mark>
   ff
   ff+
   fff
+```
 
 Note: Dynamic Forks:
 --------------------
+
 Use upper case dynamic letters to indicate forks in the dynamics
 which should be filled automatically.  Note that all notes
 in the voice assigned to the first note in the fork will be
