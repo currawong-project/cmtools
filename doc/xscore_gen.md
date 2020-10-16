@@ -1,7 +1,7 @@
-xscore_gen
+score_gen
 ==========
 
-*xscore_gen* parses MusicXML score files and generates a text file
+The `cmtools` *score_gen* command parses MusicXML score files and generates a text file
 which allows the score to be clarified and additional information to
 be added.  This is the first step in creating a 'machine readable
 score' based on the 'human readable score'.
@@ -25,15 +25,15 @@ text strings.
 
 2. Generate the MusicXML file using the [Dolet 6 Sibelius
 plug-in](https://www.musicxml.com/).  The resulting MusicXML file is
-run through *xscore_gen* and parsed to find any invalid structures
+run through *score_gen* and parsed to find any invalid structures
 such as damper up events not preceeded by damper down events, or tied
 notes with no ending note. These problems are cleared by careful
 re-editing of the score within Sibelius until all the problematic
 structures are fixed.
 
-3. As a side effect of step 2 a template 'decoration' file is generated.
+3. As a side effect of step 2 a template 'edit' file is generated.
 This text file has all the relavant 'machine score' information 
-from the XML score as a time tagged list. In this step *decoration* information is manually
+from the XML score as a time tagged list. In this step *edit* information is manually
 added by entering codes at the end of each line.  The codes
 are cryptic but they are also succinct and allow for relatively
 painless editing.
@@ -50,7 +50,7 @@ cmtools --score_gen -x GUTIM_20200803_utf8.xml -d edit0.txt -c score.csv -m scor
 ```
 
 As with step 2 this step may need to be iterated several times
-to clear syntactic errors in the decoration data.
+to clear syntactic errors in the edit data.
 
 5. Generate the time line marker information to be used with the performance program:
 
@@ -78,15 +78,15 @@ There are currently three defined groups
 
 ### Score Coloring Chart:
 
-Description         Number   Color
-------------------- -------- -------------------------
-Even                #0000FF  blue 
-Tempo               #00FF00  green
-Dyn                 #FF0000  red
-Tempo + Even        #00FFFF  green + blue (turquoise)
-Dyn   + Even        #FF00FF  red   + blue
-Dyn   + Tempo       #FF7F00  red   + green (brown)
-Tempo + Even + Dyn  #996633  purple
+Description         | Number   | Color
+------------------- | -------- | -------------------------
+Even                | #0000FF  | blue 
+Tempo               | #00FF00  | green
+Dyn                 | #FF0000  | red
+Tempo + Even        | #00FFFF  | green + blue (turquoise)
+Dyn   + Even        | #FF00FF  | red   + blue
+Dyn   + Tempo       | #FF7F00  | red   + green (brown)
+Tempo + Even + Dyn  | #996633  | purple
 
 Decrement color by one (i.e. 0xFE) to indicate the last note in a group
 of measured notes.  Note that a decremented color stops all active measures
@@ -134,14 +134,14 @@ this problem by editing the first line with `vi`.
 
 
 
-Create the decoration file
+Create the edit file
 --------------------------
 
 ```
-cmtools --score_gen -x myscore.xml -d mydec.txt {--damper}
+cmtools --score_gen -x myscore.xml -d myedit.txt {--damper}
 ```
 
-Here's a snippet of a typical 'decoration' file.
+Here's a snippet of a typical 'edit' file.
 
 ```
 Part:P1
@@ -165,7 +165,7 @@ Part:P1
        14   5     0    3072   768  4.0     -R------------- 3840
 ```
 
-### Decoration file format
+### Edit file format
 
 Column | Description
 -------|-----------------------------
@@ -179,7 +179,7 @@ flags  | event attributes
 
 ### Event attribute flags:
 
-Event attribute symbols used in the decoration file:
+Event attribute symbols used in the edit file:
 
 Desc      | Flag | 
 ----------|------|-----------------------------------------
@@ -204,7 +204,7 @@ Onset     |  *   | note onset
 
 
 
-Decoration Sytax:
+Edit Sytax:
 ------------------
 
 ```
