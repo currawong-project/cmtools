@@ -45,6 +45,10 @@ run again to generate three output files:
 - MIDI file suitable for audio rendering
 - SVG piano roll file
 
+```
+cmtools --score_gen -x GUTIM_20200803_utf8.xml -d edit0.txt -c score.csv -m score.mid -s score_svg.html -r report.txt
+```
+
 As with step 2 this step may need to be iterated several times
 to clear syntactic errors in the decoration data.
 

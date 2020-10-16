@@ -33,6 +33,7 @@ enum
  kNoActionIdSelectedCtRC,
  kMissingRequiredFileNameCtRC,
  kScoreGenFailedCtRC,
+ kScoreEditMergeFailedCtRC,
  kScoreFollowFailedCtRC,
  kMidiFileRptFailedCtRC,
  kTimeLineRptFailedCtRC,
@@ -46,14 +47,14 @@ const cmChar_t poBegHelpStr[] =
   "\n"
   "USAGE:\n"
   "\n"
-  "Parse an XML score file and decoration file to produce a score file in CSV format.\n"
+  "Parse an XML score file and 'edit' file to produce a score file in CSV format.\n"
   "\n"
-  "cmtool --score_gen -x <xml_file> -d <dec_fn> {-c <csvScoreOutFn} {-m <midiOutFn>} {-s <svgOutFn>} {-r report} {-b begMeasNumb} {t begTempoBPM}\n"
+  "cmtool --score_gen -x <xml_file> -d <edit_fn> {-c <csvScoreOutFn} {-m <midiOutFn>} {-s <svgOutFn>} {-r report} {-b begMeasNumb} {t begTempoBPM}\n"
   "\n"
   "Notes:\n"
-  "1.  If <dec_fn> does not exist then a decoration template file will be generated based on the MusicXML file. \n"
-  "2.  Along with the CSV score file MIDI and HTML/SVG files will also be produced based on the contents of the MusicXML and decoration file.\n"
-  "3. See README.md for a detailed description of the how to edit the decoration file.\n"
+  "1.  If <edit_fn> does not exist then a edit template file will be generated based on the MusicXML file. \n"
+  "2.  Along with the CSV score file MIDI and HTML/SVG files will also be produced based on the contents of the MusicXML and edit file.\n"
+  "3. See README.md for a detailed description of the how to edit the edit file.\n"
   "\n"
   "\n"
   "Use the score follower to generate a timeline configuration file.\n"
@@ -103,17 +104,38 @@ bool verify_non_null_filename( cmCtx_t* ctx, const cmChar_t* fn, const cmChar_t*
   return kOkCtRC;
 }
 
-cmRC_t score_gen( cmCtx_t* ctx, const cmChar_t* xmlFn, const cmChar_t* decFn, const cmChar_t* csvOutFn, const cmChar_t* midiOutFn, const cmChar_t* svgOutFn, unsigned reportFl, int begMeasNumb, int begTempoBPM, bool svgStandAloneFl, bool svgPanZoomFl, bool damperRptFl )
+cmRC_t score_gen( cmCtx_t* ctx, const cmChar_t* xmlFn, const cmChar_t* editFn, const cmChar_t* csvOutFn, const cmChar_t* midiOutFn, const cmChar_t* svgOutFn, unsigned reportFl, int begMeasNumb, int begTempoBPM, bool svgStandAloneFl, bool svgPanZoomFl, bool damperRptFl )
 {
   cmRC_t rc;
   if((rc = verify_file_exists(ctx,xmlFn,"XML file")) != kOkCtRC )
     return rc;
   
-  if( cmXScoreTest( ctx, xmlFn, decFn, csvOutFn, midiOutFn, svgOutFn, reportFl, begMeasNumb, begTempoBPM, svgStandAloneFl, svgPanZoomFl, damperRptFl ) != kOkXsRC )
+  if( cmXScoreTest( ctx, xmlFn, editFn, csvOutFn, midiOutFn, svgOutFn, reportFl, begMeasNumb, begTempoBPM, svgStandAloneFl, svgPanZoomFl, damperRptFl ) != kOkXsRC )
     return cmErrMsg(&ctx->err,kScoreGenFailedCtRC,"score_gen failed.");
     
   return kOkCtRC;
 }
+
+cmRC_t score_edit_merge( cmCtx_t* ctx, const cmChar_t* xmlFn, const cmChar_t* editFn, unsigned begMeasNumb, const cmChar_t* keyEditFn, unsigned keyMeasNumb, const cmChar_t* outFn )
+{
+  cmRC_t rc;
+  
+  if((rc = verify_file_exists(ctx,xmlFn,"XML file")) != kOkCtRC )
+    return rc;
+  
+  if((rc = verify_file_exists(ctx,editFn,"reference edit file")) != kOkCtRC )
+    return rc;
+
+  if((rc = verify_file_exists(ctx,editFn,"key edit file")) != kOkCtRC )
+    return rc;
+
+  if( cmXScoreMergeEditFiles( ctx, xmlFn, editFn, begMeasNumb, keyEditFn, keyMeasNumb, outFn ) != kOkXsRC )
+    return cmErrMsg(&ctx->err,kScoreEditMergeFailedCtRC,"Score merge failed failed.");
+    
+  return kOkCtRC;      
+}
+
+
 
 cmRC_t score_follow( cmCtx_t* ctx, const cmChar_t* csvScoreFn, const cmChar_t* midiInFn, const cmChar_t* matchRptOutFn, const cmChar_t* matchSvgOutFn,  const cmChar_t* midiOutFn, const cmChar_t* timelineFn )
 {
@@ -215,7 +237,10 @@ int main( int argc, char* argv[] )
    kInvalidPoId = kBasePoId,
    kActionPoId,
    kXmlFileNamePoId,
-   kDecorateFileNamePoId,
+   kEditFileNamePoId,
+   kKeyEditFileNamePoId,
+   kKeyMeasNumbPoId,
+   kOutEditFileNamePoId,
    kCsvOutFileNamePoId,
    kPgmRsrcFileNamePoId,
    kMidiOutFileNamePoId,
@@ -238,6 +263,7 @@ int main( int argc, char* argv[] )
   enum {
         kNoSelId,
         kScoreGenSelId,
+        kScoreEditMergeSelId,
         kScoreFollowSelId,
         kMeasGenSelId,
         kScoreReportSelId,
@@ -256,7 +282,9 @@ int main( int argc, char* argv[] )
   const cmChar_t* appTitle        = "cmtools";
   cmCtx_t         ctx;
   const cmChar_t* xmlFn           = NULL;
-  const cmChar_t* decFn           = NULL;
+  const cmChar_t* editFn          = NULL;
+  const cmChar_t* keyEditFn       = NULL;
+  const cmChar_t* outEditFn       = NULL;
   const cmChar_t* pgmRsrcFn       = NULL;
   const cmChar_t* csvScoreFn      = NULL;
   const cmChar_t* midiOutFn       = NULL;
@@ -270,6 +298,7 @@ int main( int argc, char* argv[] )
   unsigned        svgStandAloneFl = 1;
   unsigned        svgPanZoomFl    = 1;
   int             begMeasNumb     = 0;
+  int             keyMeasNumb     = 0;
   int             begTempoBPM     = 60;
   unsigned        damperRptFl     = 0;
   unsigned        begMidiUId      = cmInvalidId;
@@ -288,6 +317,9 @@ int main( int argc, char* argv[] )
 
   cmPgmOptInstallEnum( poH, kActionPoId, 'S', "score_gen",    0, kScoreGenSelId,    kNoSelId,  &actionSelId, 1,
     "Run the score generation tool.","Action selector");
+  
+  cmPgmOptInstallEnum( poH, kActionPoId, 'D', "merge_edit",    0, kScoreEditMergeSelId,    kNoSelId,  &actionSelId, 1,
+    "Synchronize and copy the edit information from one edit file into another.","Action selector");
 
   cmPgmOptInstallEnum( poH, kActionPoId, 'F', "score_follow", 0, kScoreFollowSelId, kNoSelId,  &actionSelId, 1,
     "Run the time line marker generation tool.",NULL);
@@ -308,12 +340,22 @@ int main( int argc, char* argv[] )
     "Generate an audio file report.",NULL);
 
   
-  cmPgmOptInstallStr( poH, kXmlFileNamePoId,      'x', "muisic_xml_fn",0,    NULL,         &xmlFn,        1, 
+  cmPgmOptInstallStr( poH, kXmlFileNamePoId,      'x', "music_xml_fn",0,    NULL,         &xmlFn,        1, 
     "Name of the input MusicXML file.");
 
-  cmPgmOptInstallStr( poH, kDecorateFileNamePoId, 'd', "dec_fn",       0,    NULL,         &decFn,        1, 
-    "Name of a score decoration file.");
+  cmPgmOptInstallStr( poH, kEditFileNamePoId,      'd', "edit_fn",    0,    NULL,         &editFn,        1, 
+    "Name of a score edit file.");
 
+  cmPgmOptInstallStr( poH, kKeyEditFileNamePoId,   'k', "key_edit_fn", 0,    NULL,      &keyEditFn,     1, 
+    "Name of a score edit key file.");
+
+  cmPgmOptInstallInt( poH, kKeyMeasNumbPoId,       'q', "key_meas",     0,       1,         &keyMeasNumb,   1,
+    "Number of the first measure number to merge in the edit key filke (see --key_edit_fn)." );
+  
+
+  cmPgmOptInstallStr( poH, kOutEditFileNamePoId,   'o', "out_edit_fn", 0,    NULL,      &outEditFn,     1, 
+    "Name of a score edit merge file.");
+  
   cmPgmOptInstallStr( poH, kCsvOutFileNamePoId,   'c', "score_csv_fn",0,    NULL,         &csvScoreFn,    1, 
     "Name of a CSV score file.");
 
@@ -376,7 +418,11 @@ int main( int argc, char* argv[] )
     switch( actionSelId )
     {
       case kScoreGenSelId:
-        rc = score_gen( &ctx, xmlFn, decFn, csvScoreFn, midiOutFn, svgOutFn, reportFl, begMeasNumb, begTempoBPM, svgStandAloneFl, svgPanZoomFl, damperRptFl );
+        rc = score_gen( &ctx, xmlFn, editFn, csvScoreFn, midiOutFn, svgOutFn, reportFl, begMeasNumb, begTempoBPM, svgStandAloneFl, svgPanZoomFl, damperRptFl );
+        break;
+
+      case kScoreEditMergeSelId:
+        rc = score_edit_merge( &ctx, xmlFn, editFn, begMeasNumb, keyEditFn, keyMeasNumb, outEditFn );
         break;
 
       case kScoreFollowSelId:

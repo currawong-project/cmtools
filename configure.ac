@@ -44,6 +44,9 @@ AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([clock_gettime floor memmove memset mkdir pow rint select socket sqrt strcasecmp strchr strcspn strerror strspn strstr strtol])
 
+# check for he prerequisite libraries
+AC_CHECK_LIB([fftw3],[fftw_malloc],[AC_MSG_RESULT([The 'FFTW' library was found.])],[AC_MSG_ERROR([The 'FFTW' library was not found.])])
+AC_CHECK_LIB([asound],[snd_asoundlib_version],[AC_MSG_RESULT([The 'ALSA' library was found.])],[AC_MSG_ERROR([The 'ALSA' library was not found.])])
 
 # The following is a custom macro in ./m4/os_type.m4
 # be sure to also set "ACLOCAL_AMFLAGS = -I m4" in ./Makefile.am
@@ -69,15 +72,16 @@ AC_ARG_ENABLE([build_libcm],
        *) AC_MSG_ERROR([bad value ${enableval} for --enable-build_libcm]) ;;
      esac],[build_libcm=false])
      
-echo "build_libcm=${build_libcm}"
 
 # check if a nested copy of libcm exists in /src/libcm
 AC_CHECK_FILE([${srcdir}/src/libcm/src/cmGlobal.h],[local_libcm=true],[local_libcm=false])
 echo "local_libcm=${local_libcm}"
+echo "build_libcm=${build_libcm}"
 
 # set BUILD_LIBCM if a libcm build request was set and a nested copy of libcm exists
 AM_CONDITIONAL([BUILD_LIBCM], [test x$build_libcm = xtrue -a x$local_libcm = xtrue ])
 
+# enable debug
 AC_ARG_ENABLE([debug],
      [  --enable-debug    Turn on debugging],
      [case "${enableval}" in
@@ -94,6 +98,7 @@ if test x$debug = xfalse; then
 AC_DEFINE([NDEBUG], 1,[Debugging off.])
 fi
 
+# enable the use of Atlas library
 AC_ARG_ENABLE([vectop],
      [  --enable-vectop    Turn on use of Lapack and Atlas vector/matrix operations. ],
      [case "${enableval}" in
@@ -110,6 +115,7 @@ AC_DEFINE([CM_VECTOP], 1,[Use Lapack and Atlas.])
 fi
 
 
+# enable memory alignment
 AC_ARG_ENABLE([memalign],
      [  --enable-memalign    Turn on memory alignment on dynamic memory allocations. ],
      [case "${enableval}" in
@@ -125,6 +131,7 @@ if test x"$memalign" = xtrue; then
 AC_DEFINE([CM_MEMALIGN], 1,[Turn on dynamic memory alignment.])
 fi
 
+# enable sonic arts code inclusion
 AC_ARG_ENABLE([sonicart],
      [  --enable-sonicart    Enable use of Sonic Arts proprietary code. ],
      [case "${enableval}" in
@@ -146,7 +153,7 @@ AC_CONFIG_FILES([ Makefile ])
 
 # if local nested libcm then do recursive configure into subdirs
 if test x$build_libcm = xtrue -a x$local_libcm = xtrue; then
-AC_CONFIG_SUBDIRS([src/libcm])
+   AC_CONFIG_SUBDIRS([src/libcm])
 fi
 
 AC_OUTPUT

@@ -219,6 +219,32 @@ index line  loctn bar idx type  pitch ETD Dynamic
 
 ```
 
+Score Merge
+===========
+
+Copy the manual edits from 'frag.txt' to the correct location, beginning with measure 284, in the blank edit file 'edit0.txt'.
+
+```
+cmootls  --merge_edit -d edit0.txt  -b 284 -k frag.txt -o temp.txt
+```
+
+All the events in 'frag.txt' may not be able to be located in 'edit0.txt'. Warning messages will be generated for
+each of these events.
+
+```
+XScore warning: Sync error: meas:301 18 index:7 8 A#4 (midi:70) edit:!mp+ (RC:14)
+XScore warning: Sync error: meas:322 39 index:32 33 C2 (midi:36) edit:!!PPP (RC:14)
+XScore warning: Sync error: meas:335 52 index:15 16 D4 (midi:62) edit:!ppp (RC:14)
+XScore warning: Sync error: meas:343 60 index:18 19 E5 (midi:76) edit:%%a !mf (RC:14)
+XScore warning: Sync error: meas:343 60 index:18 20 D4 (midi:62) edit:!fff (RC:14)
+XScore warning: Sync error: meas:343 60 index:18 21 F#4 (midi:66) edit:!fff (RC:14)
+XScore warning: Sync error: meas:343 60 index:18 22 G1 (midi:31) edit:!mp (RC:14)
+XScore warning: Sync error: meas:343 60 index:18 23 B1 (midi:35) edit:!ff (RC:14)
+XScore warning: Sync error: meas:350 67 index:51 54 F4 (midi:65) edit:!mf+ (RC:14)
+XScore warning: Sync error: meas:350 67 index:50 55 A#5 (midi:82) edit:!mf+ (RC:14)
+```
+
+
 MIDI File Reports
 =================
 
@@ -240,9 +266,8 @@ tlPrefix is the folder where data files for this timeline are stored.
 Score Follow Report
 ===================
 
-```
-cmtool  --score_follow -c round2.csv -i new_round2.mid -r report.txt -s report_svg.html
- ```
+    cmtool  --score_follow -c round2.csv -i new_round2.mid -r report.txt -s report_svg.html
+ 
  
 SVG Description
 ---------------

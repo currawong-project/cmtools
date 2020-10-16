@@ -5,9 +5,10 @@ AM_CFLAGS   =
 
 ACLOCAL_AMFLAGS = -I m4 # use custom macro's in ./m4 
 
+
 # if we are building and linking to a nested copy of libcm
 if BUILD_LIBCM
-  SUBDIRS      = src/libcm  # causes recursive make into given sub-directories
+#  SUBDIRS      = src/libcm  # causes recursive make into given sub-directories
   AM_CPPFLAGS += -I$(srcdir)/src/libcm/src  -I$(srcdir)/src/libcm/src/dsp  -I$(srcdir)/src/libcm/src/vop  -I$(srcdir)/src/libcm/src/app
   AM_LDFLAGS  += -Lsrc/libcm/src
 endif
