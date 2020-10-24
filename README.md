@@ -35,7 +35,7 @@ cmtools --score_gen -x <xml_file> -d <edit_fn> {-c <csvOutFn>} {-m <midiOutFn>} 
 Along with the CSV file this command can also generate an SVG (scalable vector graphics) file which shows the
 augmented score in piano roll form, and a MIDI file which can be used to render the score with a synthesizer.
 
-
+[READ MORE](https://gitea.currawongproject.org/cml/cmtools/src/branch/master/doc/xscore_gen.md)
 
 
 
