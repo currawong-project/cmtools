@@ -89,8 +89,24 @@ Dyn   + Tempo       | #FF7F00  | red   + green (brown)
 Tempo + Even + Dyn  | #996633  | purple
 
 Decrement color by one (i.e. 0xFE) to indicate the last note in a group
-of measured notes.  Note that a decremented color stops all active measures
-not just the measurement associated with the decremented color.  
+of measured notes.
+
+To be more precise:
+Decrementing a note indicates the end of a 'measurement group'.
+
+A measurement group is a set of notes marked for a measurement style
+(e.g. even,dynamics,tempo, even+dynamics, ... ).  A measurement
+section may contain multiple measurement groups - each of which is
+terminated by a decremented color.
+
+There is no concept of an 'end of section'.  The end of section is the
+same as the beginning of the next section.
+
+Note that if the terminating note of a given measurement group
+contains two styles then only one color needs to be decremented to end
+the group. For example if the terminating note is marked for both
+evenness and dynamics (red + blue) then decrementing either red or
+blue will terminate both the evenness and dynamics measurements.
 
 
 ### Section Numbering
@@ -112,7 +128,7 @@ After generating the file it is necessary to do some
 minor pre-processing before submitting it to *xscore_gen*
 
 ```
-iconv -f UTF-16 -t UTF-8 -o score-utf16.xml score-utf8.xml
+iconv -f UTF-16 -t UTF-8 -o score-utf8.xml score-utf16.xml
 ```
 
 On the first line of score-utf8.xml change:
