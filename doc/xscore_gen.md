@@ -199,7 +199,7 @@ Event attribute symbols used in the edit file:
 
 Desc      | Flag | 
 ----------|------|-----------------------------------------
-Bar       |  |   | Beginning of a measure
+Bar       |  \|  | Beginning of a measure
 Rest      |  R   | Rest event
 Grace     |  G   | Grace note event
 Dot       |  .   | note is dotted
@@ -246,8 +246,8 @@ $<sci_pitch>            Assign a note a new pitch
 Note: The first non-grace note in a grace note sequence is marked with a %b.
 The last non-grace note in a grace note sequence is marked with a %s or %a.
 
-Where: %s = steal time from the note marked with %b.
-       %a = insert time prior to the note marked with %a.
+> %s = steal time from the note marked with %b.
+> %a = insert time prior to the note marked with %a.
        
  The last (by row number) note (grace or non-grace) in the the sequence
 is marked with %%# where # is replaced with a,b,s,or g.
