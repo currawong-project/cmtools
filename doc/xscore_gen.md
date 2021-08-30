@@ -233,6 +233,7 @@ Edit Sytax:
 %<grace_note_flag>      Flag note as a grace note
 %%<grace_note_flag>         -last note in grace note sequence
 $<sci_pitch>            Assign a note a new pitch
+[ <comment> ]           Add an arbitrary comment.
 
 <grace_note_flag>
   b (begin grace)
@@ -255,6 +256,9 @@ is marked with %%# where # is replaced with a,b,s,or g.
 It is only necessary to mark the tick number of grace notes in order
 to give the time sequence of the notes. A single grace note therefore does
 not require an explict tick mark notation (i.e. @####)
+
+Note that a given event (e.g. note,rest,bar) can be marked as both the
+begin (i.e.%b) and end (e.g. %%a, %s) of a grace note sequence. 
 
 
 Insert/delete  Event Marks: <mark>
